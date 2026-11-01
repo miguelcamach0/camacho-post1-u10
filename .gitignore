@@ -1,0 +1,6 @@
+# Archivos generados por Maven
+target/
+
+# Archivos temporales de SonarQube
+.scannerwork/
+.sonar/

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,33 +16,72 @@
     </description>
 
     <properties>
+        <!-- Configuracion general del proyecto -->
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versiones de pruebas y cobertura -->
         <junit.version>5.11.4</junit.version>
+        <jacoco.version>0.8.13</jacoco.version>
+
+        <sonar.projectKey>com.universidad:envios-service</sonar.projectKey>
+        <sonar.projectName>Envios Service</sonar.projectName>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+
+        <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
+        <!-- JUnit Jupiter: pruebas unitarias y parametrizadas -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
+            <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+
+            <!-- Compilacion mediante Java 21 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.0</version>
             </plugin>
 
+            <!-- Ejecucion de pruebas JUnit 5 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
             </plugin>
+
+            <!-- Instrumentacion y reportes de cobertura -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
