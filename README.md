@@ -1,7 +1,7 @@
 # Envios Service — Diagnóstico y Mejora Guiada por Métricas
 
 ## Decisiones de diseño
-1. *Entorno de análisis:* Se seleccionó SonarQube Community Build ejecutado localmente mediante Docker, considerando dos criterios principales: la autonomía de configuración y el control del entorno de análisis.
+**1. Entorno de análisis:** Se seleccionó SonarQube Community Build ejecutado localmente mediante Docker, considerando dos criterios principales: la autonomía de configuración y el control del entorno de análisis.
 
 En primer lugar, la instancia local permite administrar los Quality Profiles y Quality Gates necesarios para establecer reglas y umbrales personalizados. Esta capacidad resulta fundamental para la segunda parte del laboratorio, en la que se evaluará el cumplimiento de criterios específicos de complejidad, cobertura y duplicación.
 
@@ -9,7 +9,7 @@ En segundo lugar, el análisis local permite mantener un entorno de evaluación 
 
 Como contrapartida, esta alternativa exige recursos computacionales adicionales y mantener el servidor disponible durante los análisis. No obstante, estas limitaciones se consideran aceptables frente a la flexibilidad requerida para desarrollar las actividades de diagnóstico y mejora.
 
-2. *Exclusiones del análisis:* Se decidió no establecer exclusiones mediante sonar.exclusions, debido a que la clase ServicioCalculoEnvio constituye el objeto principal del diagnóstico y concentra la lógica de negocio que se pretende evaluar.
+**2. Exclusiones del análisis:** Se decidió no establecer exclusiones mediante sonar.exclusions, debido a que la clase ServicioCalculoEnvio constituye el objeto principal del diagnóstico y concentra la lógica de negocio que se pretende evaluar.
 
 Excluir total o parcialmente esta implementación reduciría artificialmente el alcance de las mediciones y comprometería la validez de la comparación posterior a la refactorización.
 
@@ -50,15 +50,15 @@ La inspección del código fuente permitió identificar comportamientos no ejerc
 
 Estos resultados no demuestran que las reglas no verificadas sean incorrectas, sino que actualmente no existe evidencia automatizada suficiente para validar sus comportamientos.
 
-3. *Métrica usada como señal principal:* Se seleccionó la ***complejidad ciclomática*** como métrica principal, debido a su relación directa con la cantidad de caminos independientes que introduce la lógica condicional del método calcularCosto().
+**3. Métrica usada como señal principal:** Se seleccionó la ***complejidad ciclomática*** como métrica principal, debido a su relación directa con la cantidad de caminos independientes que introduce la lógica condicional del método calcularCosto().
 
 El valor inicial de 20 establece una referencia cuantitativa para evaluar la efectividad de la refactorización. La mejora deberá reducir la concentración de decisiones en el método orquestador, distribuyendo las responsabilidades sin modificar las reglas de negocio existentes. La complejidad cognitiva se utilizará como indicador complementario de mantenibilidad, mientras que la cobertura de ramas permitirá comprobar si las nuevas pruebas ejercitan las alternativas inicialmente omitidas.
 
-4. *Patrón elegido:* Se eligió ***Strategy (GoF)*** porque las condiciones de calcularCosto() seleccionaban cuatro algoritmos independientes según el método de envío. Se descartó State, al no existir estados internos ni transiciones, y Chain of Responsibility, porque las solicitudes no recorren una secuencia de manejadores.
+**4. Patrón elegido:** Se eligió ***Strategy (GoF)*** porque las condiciones de calcularCosto() seleccionaban cuatro algoritmos independientes según el método de envío. Se descartó State, al no existir estados internos ni transiciones, y Chain of Responsibility, porque las solicitudes no recorren una secuencia de manejadores.
 
 La refactorización separó cada modalidad en una estrategia, manteniendo en ServicioCalculoEnvio los ajustes comunes de fragilidad y descuentos. Además, se incorporó CalculadoraTramosPeso para reutilizar cálculos compartidos entre ESTANDAR y EXPRESS. Como resultado, la complejidad ciclomática del método principal disminuyó de 20 a 5 (−75 %). 
 
-5. *Criterio de pruebas agregadas:* La ampliación de las pruebas se fundamentó en el reporte inicial de JaCoCo, que registró 31 de 38 ramas sin cubrir. Las dos pruebas originales únicamente verificaban un envío ESTANDAR de bajo peso y la aplicación del descuento PREMIUM, por lo que gran parte de la lógica de negocio permanecía sin ejercitar. 
+**5. Criterio de pruebas agregadas:** La ampliación de las pruebas se fundamentó en el reporte inicial de JaCoCo, que registró 31 de 38 ramas sin cubrir. Las dos pruebas originales únicamente verificaban un envío ESTANDAR de bajo peso y la aplicación del descuento PREMIUM, por lo que gran parte de la lógica de negocio permanecía sin ejercitar. 
 
 Se incorporaron pruebas unitarias y parametrizadas para verificar las modalidades ESTANDAR, EXPRESS, OVERNIGHT e INTERNACIONAL. Los escenarios contemplaron los tres intervalos de peso, incluidos los valores límite de 5 y 20 kg, así como los recargos por distancia correspondientes a cada modalidad.
 
@@ -68,7 +68,7 @@ Adicionalmente, se amplió ServicioCalculoEnvioTest para comprobar el incremento
 
 También se incorporaron pruebas de fragilidad, descuento CORPORATIVO y métodos no soportados, conservando las pruebas originales. Cada escenario comprueba un resultado esperado o una excepción, evitando pruebas superficiales. La cobertura final de ramas alcanzó el 100 %.
 
-6. *Realismo del Quality Gate:* Se configuraron el Quality Profile y el Quality Gate Estándar Laboratorio, estableciendo un límite de CC ≤ 10 por método mediante la regla java:S1541. Según la Tabla 3.2 de la guía, este valor corresponde al máximo del rango moderado (5–10), considerado aceptable bajo seguimiento y pruebas. A partir de CC = 11, la complejidad se clasifica como alta y se recomienda refactorizar. Por tanto, el umbral permite controlar métodos complejos sin exigir que todos alcancen el nivel bajo (1–4).
+**6. Realismo del Quality Gate:** Se configuraron el Quality Profile y el Quality Gate Estándar Laboratorio, estableciendo un límite de CC ≤ 10 por método mediante la regla java:S1541. Según la Tabla 3.2 de la guía, este valor corresponde al máximo del rango moderado (5–10), considerado aceptable bajo seguimiento y pruebas. A partir de CC = 11, la complejidad se clasifica como alta y se recomienda refactorizar. Por tanto, el umbral permite controlar métodos complejos sin exigir que todos alcancen el nivel bajo (1–4).
 
 Asimismo, se estableció una cobertura global mínima del 70 %, considerada exigente pero más realista que imponer un 100 %, lo cual podría incentivar pruebas superficiales. Se añadieron condiciones de duplicación máxima del 5 % y cero nuevos problemas de mantenibilidad, esta última mediante Maintainability Issues en SonarQube MQR.
 
